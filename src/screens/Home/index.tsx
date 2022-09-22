@@ -11,8 +11,9 @@ import {
   Metadata,
   Title,
   TotalPassCount,
-  LoginList,
+  LoginList  
 } from './styles';
+import { View } from 'react-native';
 
 interface LoginDataProps {
   id: string;
@@ -24,24 +25,75 @@ interface LoginDataProps {
 type LoginListDataProps = LoginDataProps[];
 
 export function Home() {
+  const dados = [
+    {
+      id: '1',
+      service_name: 'Rocketseat Prisco',
+      email: 'priscocleyton@gmail.com',
+      password: '123123',
+    },
+    {
+      id: '2',
+      service_name: 'Hotmail Prisco',
+      email: 'priscocleyton@hotmail.com',
+      password: '123456789',
+    },
+    {
+      id: '3',
+      service_name: 'Hotmail Henrique',
+      email: 'henrique@hotmail.com',
+      password: '123456',
+    },
+
+  ]
+
   const [searchText, setSearchText] = useState('');
   const [searchListData, setSearchListData] = useState<LoginListDataProps>([]);
-  const [data, setData] = useState<LoginListDataProps>([]);
+  const [data, setData] = useState<LoginListDataProps>(dados);
 
   async function loadData() {
     const dataKey = '@savepass:logins';
     // Get asyncStorage data, use setSearchListData and setData
+    const data = await AsyncStorage.getItem(dataKey);
+    if (data) {
+      setData(JSON.parse(data))
+      setSearchListData(JSON.parse(data))
+    }            
   }
 
   function handleFilterLoginData() {
-    // Filter results inside data, save with setSearchListData
+    // Filter results inside data, save with setSearchListData    
+    if (!searchText)
+      return;
+
+    const foundItem = searchListData.find(item => {
+      if (item.service_name.includes(searchText)){ 
+        return item;
+      }             
+    });
+      
+    if (foundItem)
+      setSearchListData([foundItem])
+    
+    
+
   }
 
   function handleChangeInputText(text: string) {
     // Update searchText value
+    if (text === '') {
+      setSearchListData(data)
+      setSearchText(text)
+    } else {
+      setSearchText(text)
+    }
   }
 
   useFocusEffect(useCallback(() => {
+    // alert('remover 1')
+    // setData(dados)
+    // setSearchListData(dados)
+
     loadData();
   }, []));
 
